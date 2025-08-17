@@ -1,18 +1,18 @@
 #########################################################################
-##############               Maps end Graphics             ##############
+##############               Maps and Graphics             ##############
 #########################################################################
 
 
 ###  Packages and Set Work Directory
-rm(list = ls()) ; setwd(dir = "~/Dropbox/Unicamp - Cristiano/SINASC/") ; library(ggplot2) ; library(ggspatial) ; library(spdep) ; library(dplyr) ; library(tmap) ; library(biscale) ; library(cowplot) ; library(geobr) ; library(RColorBrewer) ; library(stringr) ; library(ggpubr)  ; library(classInt) ; library(sf)
+rm(list = ls()) ; library(ggplot2) ; library(ggspatial) ; library(spdep) ; library(dplyr) ; library(tmap) ; library(biscale) ; library(cowplot) ; library(geobr) ; library(RColorBrewer) ; library(stringr) ; library(ggpubr)  ; library(classInt) ; library(sf)
 
 
 ### Loading SGA and Mortality Data (first part)
 # SGA for WHO table
-#load(file = "~/Documentos/opendatasus - PIG WHO Intergrowth/Taxa_Baixo_Peso_Mortalidade_who.RData")             
+#load(file = "data/Taxa_Baixo_Peso_Mortalidade_who.RData")             
 
 # SGA for Intergrowth table
-load(file = "~/Documentos/opendatasus - PIG WHO Intergrowth/Taxa_Baixo_Peso_Mortalidade_intergrowth.RData")
+load(file = "data/Taxa_Baixo_Peso_Mortalidade_intergrowth.RData")
 
 
 
@@ -65,15 +65,15 @@ eval(parse(text = paste0(' fig_bp_',ano_dado -2013 ,'<- ggplot() +
                           style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + no_axis ')  )) 
 } 
 
-# theme(legend.text = element_text(size = 16)) # Aumenta tamanho do texto legenda
-#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Baixo Peso - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   # width = 8.3, height = 11.7, # width = 14, height = 12,   #legendas_bp<- get_legend(fig_bp_1)
-gg_baixo_peso<- ggarrange(fig_bp_1, fig_bp_2, fig_bp_3,   fig_bp_4, fig_bp_5, fig_bp_6,   fig_bp_7, fig_bp_8, fig_bp_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")   
+theme(legend.text = element_text(size = 16)) # Aumenta tamanho do texto legenda
+#Export plot in pdf format
+#pdf(paste0("Maps and tables/",referencia_pig, "_Baixo Peso - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+#In case you want to export the jpeg
+#jpeg( paste0("Maps and tables/",referencia_pig,"_Baixo Peso - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   # width = 8.3, height = 11.7, # width = 14, height = 12,   #legendas_bp<- get_legend(fig_bp_1)
+gg_baixo_peso<- ggarrange(fig_bp_1, fig_bp_2, fig_bp_3,   fig_bp_4, fig_bp_5, fig_bp_6,   fig_bp_7, fig_bp_8, fig_bp_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")
 annotate_figure(gg_baixo_peso, top = text_grob("Smal for Gestational Age across Brazilian microregions", color = "black", face = "bold", size = 14))
 #dev.off()
 #
- 
-
-
 
 
 ##############################################################################################
@@ -98,8 +98,10 @@ eval(parse(text = paste0(' fig_mort_',ano_dado -2013 ,'<- ggplot() +
   annotation_north_arrow( location = "br", which_north = "true", height = unit(1, "cm"), width = unit(1, "cm"), pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"), 
                           style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + no_axis ')  )) ; 
 }
-
-#jpeg( paste0("~/Downloads/Baixo Peso/Mortalidade - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+#Export plot in pdf
+#pdf(paste0("Maps and tables/Mortalidade - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+#In case you want jpeg
+#jpeg( paste0("Maps and tables/Mortalidade - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_mort<- ggarrange(fig_mort_1, fig_mort_2, fig_mort_3,   fig_mort_4, fig_mort_5, fig_mort_6,   fig_mort_7, fig_mort_8, fig_mort_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")   # ,legend = 'right', legend.grob = legendas_bp
 annotate_figure(gg_mort, top = text_grob("Infant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
 #dev.off() 
@@ -135,7 +137,10 @@ eval(parse(text = paste0( ' fig_biv_',ano_dado -2013 ,'<-  ggplot() + geom_sf(da
 # SGA and Mortality
 legendas_bv <- bi_legend(pal = "GrPink", dim = 3, xlab = "Small for Gestational Age", ylab = "Infant Mortality Rate", size = 10) 
 
-#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Bivariado BaixoPeso_Mortalidade - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+#Export plot in pdf format
+#pdf(paste0("Maps and tables/",referencia_pig, "_Bivariado BaixoPeso_Mortalidade - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+#In case you want to export the jpeg
+#jpeg( paste0("Maps and tables/",referencia_pig,"_Bivariado BaixoPeso_Mortalidade - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_biv<- ggarrange(fig_biv_1, fig_biv_2, fig_biv_3,   fig_biv_4, fig_biv_5, fig_biv_6,   fig_biv_7, fig_biv_8, fig_biv_9,   nrow=3, ncol = 3)   # ,legend = 'right', legend.grob = legendas_bp  # , common.legend = TRUE, legend = "right"
 gg_biv_aux<- ggarrange(gg_biv,legendas_bv, nrow = 1, ncol = 2, widths = c(6,1)  )
 annotate_figure(gg_biv_aux, top = text_grob("Bivariate map, Small for Gestational Age and Infant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
@@ -198,7 +203,10 @@ eval(parse(text = paste0(' fig_moran_bv_',ano_dado -2013 ,'<-  ggplot() +
 }
 
 # Bivariate Moran: SGA - Mortality
-#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Moran Local Bivariado BaixoPeso_Mortalidade por Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+#Export plot in pdf format
+#pdf(paste0("Maps and tables/",referencia_pig, "_Moran Local Bivariado BaixoPeso_Mortalidade por Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+#In case you want to export the jpeg
+#jpeg( paste0("Maps and tables/",referencia_pig,"_Moran Local Bivariado BaixoPeso_Mortalidade por Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_moran_bv<- ggarrange(fig_moran_bv_1, fig_moran_bv_2, fig_moran_bv_3,   fig_moran_bv_4, fig_moran_bv_5, fig_moran_bv_6,   fig_moran_bv_7, fig_moran_bv_8, fig_moran_bv_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")   
 annotate_figure(gg_moran_bv, top = text_grob("Bivariate local Moran I, Small for Gestational Age and\nInfant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
 #dev.off() 
@@ -213,8 +221,8 @@ annotate_figure(gg_moran_bv, top = text_grob("Bivariate local Moran I, Small for
 ##############
 #######     Analyzing Migration Balances and the Migration Rate
 
-taxas.migracao  <- read.csv(file = "~/Downloads/Baixo Peso/Dados/TaxasMigracao.csv", header = T, sep = ";" , dec = ",")  
-#saldos.migracao <- read.csv(file = "~/Downloads/Baixo Peso/Dados/SaldosMigratario.csv", header = T, sep = ";" ) 
+taxas.migracao  <- read.csv(file = "data/TaxasMigracao.csv", header = T, sep = ";" , dec = ",")  
+#saldos.migracao <- read.csv(file = "data/SaldosMigratario.csv", header = T, sep = ";" ) 
 
 
 
@@ -243,7 +251,10 @@ eval(parse(text = paste0( ' fig_biv_migracao_',ano_dado -2013 ,'<-  ggplot() + g
 # PIG and Migration 
 legendas_bv_migracao <- bi_legend(pal = "GrPink", dim = 3, xlab = "Small for Gestational Age", ylab = nome_st_titulo, size = 10) 
 
-#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Bivariado BaixoPeso_",nome_st," - Microrregiao 2014-2018.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+#Export plot in pdf format
+#pdf(paste0("Maps and Tables/",referencia_pig, "_Bivariado BaixoPeso_",nome_st," - Microrregiao 2014-2018.pdf"), width = 14, height = 12)
+#In case you want to export the jpeg
+#jpeg( paste0("Maps and Tables/",referencia_pig,"_Bivariado BaixoPeso_",nome_st," - Microrregiao 2014-2018.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_biv_migracao<-  ggarrange( ggarrange(fig_biv_migracao_1, fig_biv_migracao_2, fig_biv_migracao_3,   fig_biv_migracao_4, nrow=2, ncol = 2),
                      fig_biv_migracao_5,   nrow = 2, ncol = 1, heights = c(2,1)) #gg_biv<- ggarrange(fig_biv_1, fig_biv_2, fig_biv_3,   fig_biv_4, fig_biv_5,   nrow=3, ncol = 2, align = "hv")   # ,legend = 'right', legend.grob = legendas_bp  # , common.legend = TRUE, legend = "right"
 gg_biv_aux_migracao<- ggarrange(gg_biv_migracao, legendas_bv_migracao, nrow = 1, ncol = 2, widths = c(6,1)  )
@@ -278,7 +289,10 @@ eval(parse(text = paste0( ' fig_biv_migracao_mort_',ano_dado -2013 ,'<-  ggplot(
 # Bivariate map
 legendas_bv_migracao_mort <- bi_legend(pal = "GrPink", dim = 3, xlab = "Infant Mortality Rate", ylab = nome_st_titulo, size = 10) 
 
-#jpeg( paste0("~/Downloads/Baixo Peso/Bivariado Mortalidade_",nome_st," - Microrregiao 2014-2018.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+#Export plot in pdf format
+#pdf(paste0("Maps and Tables/Bivariado Mortalidade_",nome_st," - Microrregiao 2014-2018.pdf"), width = 14, height = 12)
+#In case you want to export the jpeg
+#jpeg( paste0("Maps and Tables/Bivariado Mortalidade_",nome_st," - Microrregiao 2014-2018.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_biv_migracao_mort<-  ggarrange( ggarrange(fig_biv_migracao_mort_1, fig_biv_migracao_mort_2, fig_biv_migracao_mort_3,   fig_biv_migracao_mort_4, nrow=2, ncol = 2),
                      fig_biv_migracao_mort_5,   nrow = 2, ncol = 1, heights = c(2,1)) #gg_biv<- ggarrange(fig_biv_1, fig_biv_2, fig_biv_3,   fig_biv_4, fig_biv_5,   nrow=3, ncol = 2)  
 gg_biv_aux_migracao_mort<- ggarrange(gg_biv_migracao_mort, legendas_bv_migracao_mort, nrow = 1, ncol = 2, widths = c(6,1)  )
@@ -337,7 +351,10 @@ eval(parse(text = paste0(' fig_lee_',ano_dado -2013 ,'<- ggplot() +
 
 
 # Generating Map of Lee Index
-#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Indice de Lee - Brazil Standard - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+#Export plot in pdf format
+#pdf(paste0("Maps and Tables/",referencia_pig, "_Indice de Lee - Brazil Standard - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+#In case you want to export the jpeg
+#jpeg( paste0("Maps and Tables/",referencia_pig,"_Indice de Lee - Brazil Standard - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_baixo_peso_lee<- ggarrange(fig_lee_1, fig_lee_2, fig_lee_3,   fig_lee_4, fig_lee_5, fig_lee_6,   fig_lee_7, fig_lee_8, fig_lee_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")  
 annotate_figure(gg_baixo_peso_lee, top = text_grob("Lee's Index, Small for Gestational Age and\nInfant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
 #dev.off()
@@ -389,12 +406,17 @@ signif <- 0.05 ; lmoran <- lmoran%>%
   mutate(quadrant= ifelse(lmoran$Pr.z....E.Ii.. > signif, 0, quadrant))  
 
 # Making a map with areas
-#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Moran Local - ", nome_titulo," Microrregiao ", ano_dado,".jpg"), width = 7, height =5, units = 'in',  res = 400,quality = 100)   
-tm_shape(lmoran) + tm_fill(col = "quadrant",  breaks = c(0, 1, 2, 3, 4, 5) , palette= c("white","red","blue",rgb(0,0,1,alpha=0.4),rgb(1,0,0,alpha=0.4)),
-                           labels = c("Not significant", "High-High","Low-Low","Low-High","High-Low"), title="") +  tm_legend(text.size = 0.85)  + 
-  tm_borders(alpha= 0.0) + 
-  tm_layout(main.title = paste0("Moran Local: ", nome_titulo," ", ano_dado-2, " - ", ano_dado ), main.title.position = "center", frame = F) +   #tm_layout( frame = F) + 
-  tm_shape(estado_mapa) + tm_borders( alpha= 1) + tm_text(text = "abbrev_state", size = 0.6)
-#dev.off()
+#Export plot in pdf format
+pdf(paste0("Maps and Tables/",referencia_pig, "_Moran Local - ", nome_titulo," Microrregiao ", ano_dado,".pdf"), width = 14, height = 12)
+#In case you want to export the jpeg
+#jpeg( paste0("Maps and Tables/",referencia_pig,"_Moran Local - ", nome_titulo," Microrregiao ", ano_dado,".jpg"), width = 7, height =5, units = 'in',  res = 400,quality = 100)   
+tm_shape(lmoran) + tm_fill(col = "quadrant", breaks = c(0, 1, 2, 3, 4, 5) , palette= c("white","red","blue",rgb(0,0,1,alpha=0.4),rgb(1,0,0,alpha=0.4)),
+                           labels = c("Not significant", "High-High","Low-Low","Low-High","High-Low"), title="", col_alpha=0) +
+  tm_legend(text.size = 0.85) +
+  tm_borders(fill_alpha= 0.0, lwd=0) +
+  tm_layout(main.title = paste0("Moran Local: ", nome_titulo," ", ano_dado-2, " - ", ano_dado ), main.title.position = "center", frame = F)+ #tm_layout( frame = F) +
+  tm_shape(estado_mapa)+
+  tm_borders(fill_alpha = 1, lwd=2) + tm_text(text = "abbrev_state", size = 0.6)
+tm_shape(estado_mapa) + tm_borders( alpha= 1) + tm_text(text = "abbrev_state", size = 0.6)
+dev.off()
 #
-

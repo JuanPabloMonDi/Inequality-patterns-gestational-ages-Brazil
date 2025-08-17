@@ -266,10 +266,9 @@ library(ggplot2) ; library(ggspatial) ; library(spdep) ; library(dplyr) ; librar
 ### Carregando Dados do Baixo Peso: Escolher entre WHO e Intergrowth
 
 # Loading SGA RData save for WHO or Intergrowth table
-load(file = "data/resul_peso_who_mort_cidade (Parte 1).RData")             
-
+load(file = "data/resul_peso_who_mort_cidade (Parte 1).RData")
 # Loading SGA RData save for WHO or Intergrowth table
-#load(file = "~/Documentos/opendatasus - PIG WHO Intergrowth/resul_peso_intergrowth_mort_cidade.RData")             
+#load(file = "data/resul_peso_intergrowth_mort_cidade (Parte 1).RData")             
 
 # Saving data in a list, to be able to aggregate state, micro and city
 resul_baixo_peso<- list() ; resul_baixo_peso$cidade<-resul_baixo_peso_cidade 
@@ -290,11 +289,11 @@ corrigir<- TRUE ; if (corrigir == TRUE){
   
   ### Loading data; 2019 and 2020 have 7 digits =( ;
   for (aaa in 2015:2020) {  
-    eval(parse(text = paste0('  sub_nasc_', aaa, '<- read.csv(file = "Subnotitificacao/Sub_nascidos_',aaa,'.csv", header = T, sep = ";", dec = ",")   ')  ))  
+    eval(parse(text = paste0('  sub_nasc_', aaa, '<- read.csv(file = "data/Subnotification/Sub_nascidos_',aaa,'.csv", header = T, sep = ";", dec = ",")   ')  ))  
     if (aaa>= 2019){ eval(parse(text = paste0('  sub_nasc_', aaa, '$CODMUNRES<- as.numeric( substr(x = as.character(sub_nasc_', aaa, '$CODMUNRES), start = 1, stop = 6) )  ') )) }
     eval(parse(text = paste0('  sub_nasc_', aaa, '<- left_join(cidade_mapa, sub_nasc_', aaa, '[,c("CODMUNRES","Sub_MS")], by=c("code_muni"="CODMUNRES"))  ')  ))  
     
-    eval(parse(text = paste0('  sub_obit_', aaa, '<- read.csv(file = "Subnotitificacao/Sub_obitos_', aaa, '.csv", header = T, sep = ";", dec = ",")  ')  ))  
+    eval(parse(text = paste0('  sub_obit_', aaa, '<- read.csv(file = "data/Subnotification/Sub_obitos_', aaa, '.csv", header = T, sep = ";", dec = ",")  ')  ))  
     if (aaa>= 2019){ eval(parse(text = paste0('  sub_obit_', aaa, '$CODMUNRES<- as.numeric( substr(x = as.character(sub_obit_', aaa, '$CODMUNRES), start = 1, stop = 6) )  ') ))   } 
     eval(parse(text = paste0('  sub_obit_', aaa, '<- left_join(cidade_mapa, sub_obit_', aaa, '[,c("CODMUNRES","Sub_MS")], by=c("code_muni"="CODMUNRES"))   ')  ))  
   } #; sub_obit_2019$Sub_MS<- as.numeric( sub_obit_2019$Sub_MS ) ; rm(aaa) # Obits 2019 reading as character =( ; Figueirao-MS 500390 with dash
@@ -315,7 +314,7 @@ corrigir<- TRUE ; if (corrigir == TRUE){
   
   # Organizing microregions (numbering and names)
   microrregiao_mapa <- read_micro_region(code_micro="all", year=2020, showProgress = T) 
-  microrregiao_dtb<- read.csv(file = "Dados/DTB_2022.csv", header = T, sep = ";", colClasses = c("character") )
+  microrregiao_dtb<- read.csv(file = "Data/Subnotification/DTB_2022.csv", header = T, sep = ";", colClasses = c("character") )
   aux_dtb<- cbind( microrregiao_dtb[, c("UF", "Nome_UF", "Microrregião.Geográfica", "Nome_Microrregião", "Código.Município.Completo", "Nome_Município")], 
                    data.frame(codmun = as.numeric( substr(microrregiao_dtb$Código.Município.Completo,1,6) ) , code_micro = as.numeric( paste0(microrregiao_dtb$UF,microrregiao_dtb$Microrregião.Geográfica) ) )  )
 
@@ -408,7 +407,7 @@ aux_baixo_peso_br<- data.frame(NULL) ;  for( mm in 1:9){  # 3-Year Window - Orde
 baixo_peso_br<- cbind(resul_baixo_peso$micro$ano_2022[,c(-7,-8,-9)], aux_baixo_peso_br)
 
 
-#save(list = c("referencia_pig", "resul_baixo_peso", "resul_mortalidade" , "baixo_peso_br", "tx_mortalidade", "estado_mapa"), file = paste0("~/Downloads/Baixo_Peso_Mortalidade_",referencia_pig,".RData"))
-#save(list = c("referencia_pig", "baixo_peso_br", "tx_mortalidade", "estado_mapa"), file = paste0("~/Downloads/Taxa_Baixo_Peso_Mortalidade_",referencia_pig,".RData"))
+save(list = c("referencia_pig", "resul_baixo_peso", "resul_mortalidade" , "baixo_peso_br", "tx_mortalidade", "estado_mapa"), file = paste0("data/Baixo_Peso_Mortalidade_",referencia_pig,".RData"))
+save(list = c("referencia_pig", "baixo_peso_br", "tx_mortalidade", "estado_mapa"), file = paste0("data/Taxa_Baixo_Peso_Mortalidade_",referencia_pig,".RData"))
 
 
