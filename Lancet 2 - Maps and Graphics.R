@@ -1,0 +1,400 @@
+#########################################################################
+##############               Maps end Graphics             ##############
+#########################################################################
+
+
+###  Packages and Set Work Directory
+rm(list = ls()) ; setwd(dir = "~/Dropbox/Unicamp - Cristiano/SINASC/") ; library(ggplot2) ; library(ggspatial) ; library(spdep) ; library(dplyr) ; library(tmap) ; library(biscale) ; library(cowplot) ; library(geobr) ; library(RColorBrewer) ; library(stringr) ; library(ggpubr)  ; library(classInt) ; library(sf)
+
+
+### Loading SGA and Mortality Data (first part)
+# SGA for WHO table
+#load(file = "~/Documentos/opendatasus - PIG WHO Intergrowth/Taxa_Baixo_Peso_Mortalidade_who.RData")             
+
+# SGA for Intergrowth table
+load(file = "~/Documentos/opendatasus - PIG WHO Intergrowth/Taxa_Baixo_Peso_Mortalidade_intergrowth.RData")
+
+
+
+
+##############################################################################################
+#######     Map of Low Birth Weights by Microregion in Brazil - 2014 to 2022 (3-year window)
+# Chossing Color
+#display.brewer.pal(n = 9, name = 'YlOrRd') ; brewer.pal(n = 9, name = "YlOrRd")[c(1,2,3,6,8)] # Max eh 9
+summary( st_drop_geometry(baixo_peso_br[,6:14])) #summary( unlist(as.vector(st_drop_geometry(baixo_peso_br[,6:14]))) )
+
+
+### Apply Jenks algorithm with 6 breaks for each year  --  
+# All data
+jenks_breaks_all <- classIntervals(unlist(as.vector(st_drop_geometry(baixo_peso_br[,6:14]))), n = 6, style = "jenks") ; jenks_breaks_all
+
+# By Year
+jenks_breaks_2014 <- classIntervals(baixo_peso_br$Ano_2014, n = 6, style = "jenks") ; jenks_breaks_2014
+jenks_breaks_2015 <- classIntervals(baixo_peso_br$Ano_2015, n = 6, style = "jenks") ; jenks_breaks_2015
+jenks_breaks_2016 <- classIntervals(baixo_peso_br$Ano_2016, n = 6, style = "jenks") ; jenks_breaks_2016
+jenks_breaks_2017 <- classIntervals(baixo_peso_br$Ano_2017, n = 6, style = "jenks") ; jenks_breaks_2017
+jenks_breaks_2018 <- classIntervals(baixo_peso_br$Ano_2018, n = 6, style = "jenks") ; jenks_breaks_2018
+jenks_breaks_2019 <- classIntervals(baixo_peso_br$Ano_2019, n = 6, style = "jenks") ; jenks_breaks_2019
+jenks_breaks_2020 <- classIntervals(baixo_peso_br$Ano_2020, n = 6, style = "jenks") ; jenks_breaks_2020
+jenks_breaks_2021 <- classIntervals(baixo_peso_br$Ano_2021, n = 6, style = "jenks") ; jenks_breaks_2021
+jenks_breaks_2022 <- classIntervals(baixo_peso_br$Ano_2022, n = 6, style = "jenks") ; jenks_breaks_2022
+
+
+
+
+###    Generating SGA Map for each year
+for (ano_dado in 2014:2022) {  
+
+if (referencia_pig == "who") {  # Legend for data from WHO
+  eval(parse(text = paste0(' cortes_bp_', ano_dado, ' <- cut(baixo_peso_br$Ano_', ano_dado, ', breaks = c(4, 8, 12, 16, 20, 24, 32.4),  labels = c("[4:8)", "[8:12)", "[12:16)", "[16:20)", "[20:24)", "24+"),  rigth = FALSE)  ')  )) ; no_axis <- theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank()) }
+if (referencia_pig == "intergrowth") {  # Legend for data from  Intergrowth
+  eval(parse(text = paste0(' cortes_bp_', ano_dado, ' <- cut(baixo_peso_br$Ano_', ano_dado, ', breaks = c(0, 7, 8, 9, 10, 11, 20),  labels = c("[0:7)", "[7:8)", "[8:9)", "[9:10)", "[10:11)", "11+"),  rigth = FALSE)  ')  )) ; no_axis <- theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank()) }
+
+eval(parse(text = paste0(' fig_bp_',ano_dado -2013 ,'<- ggplot() + 
+  geom_sf(data = baixo_peso_br, aes(fill = cortes_bp_', ano_dado, ' ), color= NA,  size= .15) + # "grey46" ; "black"           # Escala discreta de cores
+  
+  geom_sf(data = estado_mapa, fill = NA, color= "black", size = .15, lwd = 0.45) +         # States lines
+  geom_sf_text(data = estado_mapa,aes(label = abbrev_state),size = 2.5, fontface="bold") + 
+  
+  labs(subtitle=paste0( ano_dado -2 , " - ", ano_dado) , size=8) +  
+  scale_fill_manual(values = brewer.pal(n = 9, name = "YlOrRd")[c(1,2,3,5,8,9)], drop = FALSE, name="Small for Gestational\nAge (%)") +   # In Ingles: Small for Gestational Age
+  #scale_fill_manual(values = brewer.pal(n = 9, name = "YlOrRd")[c(1,2,3,5,8,9)], drop = FALSE, name="Preterm Birth (%)")+   # In Ingles: Preterm Birth
+    
+  theme_minimal() + theme(legend.title = element_text(size = 14), legend.text = element_text(size = 14), plot.subtitle = element_text(hjust = 0.5) )+
+  annotation_north_arrow( location = "br", which_north = "true", height = unit(1, "cm"), width = unit(1, "cm"), pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"), 
+                          style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + no_axis ')  )) 
+} 
+
+# theme(legend.text = element_text(size = 16)) # Aumenta tamanho do texto legenda
+#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Baixo Peso - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   # width = 8.3, height = 11.7, # width = 14, height = 12,   #legendas_bp<- get_legend(fig_bp_1)
+gg_baixo_peso<- ggarrange(fig_bp_1, fig_bp_2, fig_bp_3,   fig_bp_4, fig_bp_5, fig_bp_6,   fig_bp_7, fig_bp_8, fig_bp_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")   
+annotate_figure(gg_baixo_peso, top = text_grob("Smal for Gestational Age across Brazilian microregions", color = "black", face = "bold", size = 14))
+#dev.off()
+#
+ 
+
+
+
+
+##############################################################################################
+#######     Mortality Map by Microregion in Brazil - 2014 to 2022 (3-year window)
+# Choosing Color
+#display.brewer.pal(n = 9, name = "Blues") ; brewer.pal(n = 9, name = "Blues")[c(1,2,3,5,8,9)] # Max is 9
+
+###    Generating the Mortality Map
+for (ano_dado in 2014:2022) {  
+
+eval(parse(text = paste0(' cortes_mort_', ano_dado,' <- cut(tx_mortalidade$Ano_', ano_dado, ', breaks = c(-0.1, 8, 12, 16, 20, 24, 120),  labels = c("[0:8)", "[8:12)", "[12:16)", "[16:20)", "[20:24)", "24+"),  rigth = FALSE)  ')  )) ; no_axis <- theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank());
+eval(parse(text = paste0(' fig_mort_',ano_dado -2013 ,'<- ggplot() + 
+  geom_sf(data = tx_mortalidade, aes(fill = cortes_mort_', ano_dado,' ), color= NA,  size= .15) + # "grey46" ; "black"           
+  
+  geom_sf(data = estado_mapa, fill = NA, color= "black", size = .15, lwd = 0.45) + 
+  geom_sf_text(data = estado_mapa,aes(label = abbrev_state),size = 2.5, fontface="bold") +  
+
+  labs(subtitle=paste0( ano_dado -2 , " - ", ano_dado) , size=8) +                                                 
+  scale_fill_manual(values = brewer.pal(n = 9, name = "Blues")[c(1,2,3,5,8,9)], drop = FALSE, name = "Infant Mortality\nRate" ) +
+  
+  theme_minimal() + theme(legend.title = element_text(size = 10), plot.subtitle = element_text(hjust = 0.5) )+
+  annotation_north_arrow( location = "br", which_north = "true", height = unit(1, "cm"), width = unit(1, "cm"), pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"), 
+                          style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + no_axis ')  )) ; 
+}
+
+#jpeg( paste0("~/Downloads/Baixo Peso/Mortalidade - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+gg_mort<- ggarrange(fig_mort_1, fig_mort_2, fig_mort_3,   fig_mort_4, fig_mort_5, fig_mort_6,   fig_mort_7, fig_mort_8, fig_mort_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")   # ,legend = 'right', legend.grob = legendas_bp
+annotate_figure(gg_mort, top = text_grob("Infant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
+#dev.off() 
+#
+
+
+
+
+
+##############################################################################################
+#######     Bivariate Analysis
+
+###    Generating the Bivariate Map for each year
+for (ano_dado in 2014:2022) { 
+
+# Fixing SGA and Adding the Death Rate of the respective year
+aux_bivariado<- baixo_peso_br ; eval(parse(text = paste0( " aux_bivariado$tx_mort_", ano_dado, " <- tx_mortalidade$Ano_", ano_dado )  ))
+
+# Adds a new column to the data (bi_class)
+eval(parse(text = paste0( ' bivaridado <- bi_class(aux_bivariado, x = Ano_',ano_dado, ' , y = tx_mort_', ano_dado,' , style = "quantile", dim = 3)  ')  ))
+
+# Generating Bivariate Map
+eval(parse(text = paste0( ' fig_biv_',ano_dado -2013 ,'<-  ggplot() + geom_sf(data = bivaridado, mapping = aes(fill = bi_class), color = NA, size = 0.1, show.legend = FALSE) +
+  bi_scale_fill(pal = "GrPink", dim = 3) + bi_theme() +
+  geom_sf(data = estado_mapa, fill = NA, color= "black", size = .15, lwd = 0.45) +
+  geom_sf_text(data = estado_mapa, aes(label = abbrev_state), size = 2.5, color = "white", fontface = "bold") +
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank()) +
+  annotation_north_arrow( location = "br", which_north = "true", height = unit(1, "cm"), width = unit(1, "cm"), pad_x = unit(1.3, "in"), pad_y = unit(0.1, "in"), 
+     style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + 
+  labs( subtitle = paste0( ano_dado-2, " - ",ano_dado )  ) + theme( plot.subtitle = element_text(face = "plain", size = 10) ) ')  ))
+}
+
+# SGA and Mortality
+legendas_bv <- bi_legend(pal = "GrPink", dim = 3, xlab = "Small for Gestational Age", ylab = "Infant Mortality Rate", size = 10) 
+
+#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Bivariado BaixoPeso_Mortalidade - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+gg_biv<- ggarrange(fig_biv_1, fig_biv_2, fig_biv_3,   fig_biv_4, fig_biv_5, fig_biv_6,   fig_biv_7, fig_biv_8, fig_biv_9,   nrow=3, ncol = 3)   # ,legend = 'right', legend.grob = legendas_bp  # , common.legend = TRUE, legend = "right"
+gg_biv_aux<- ggarrange(gg_biv,legendas_bv, nrow = 1, ncol = 2, widths = c(6,1)  )
+annotate_figure(gg_biv_aux, top = text_grob("Bivariate map, Small for Gestational Age and Infant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
+#dev.off() 
+#
+
+
+
+
+
+##############################################################################################
+#######     Bivariate Local Moran: SGA and Mortality Rate
+
+###    Generating the Bivariate Local Moran Map
+for (ano_dado in 2014:2022) {  
+
+#    Generating the Map with Neighbors removing Fernando de Noronha - PE (island)
+moran_bv_baixo_peso<-   baixo_peso_br[!(baixo_peso_br$name_micro == "Fernando De Noronha"), ] ; moran_bv_mort<- tx_mortalidade[!(tx_mortalidade$name_micro == "Fernando De Noronha"), ] ; nome_titulo<- "Moran Bivariado"
+
+# Generating neighbors by proximity to the queen (queen true, from chess). Same neighborhood for SGA and Mortality
+vizinhos <- poly2nb(moran_bv_baixo_peso, queen=TRUE) #; vizinhos[1]
+
+# Weight of neighbors; style = W and normalization by the line
+viz_pesos <- nb2listw(vizinhos, style="W", zero.policy=TRUE) 
+#; viz_pesos$weights[1] ; print.listw(viz_pesos, zero.policy = TRUE) # Cheking
+
+###   Moran Global and Local Bivariate (moran_bv and localmoran_bv = already normalize the data at input)
+eval(parse(text = paste0("  xx<- ( moran_bv_baixo_peso$Ano_", ano_dado, "  - mean( moran_bv_baixo_peso$Ano_", ano_dado, " , na.rm = T)  )/( sd( moran_bv_baixo_peso$Ano_", ano_dado, "  , na.rm = T)   ) ")  ))
+eval(parse(text = paste0("  yy<- ( moran_bv_mort$Ano_", ano_dado, "  - mean( moran_bv_mort$Ano_", ano_dado, " , na.rm = T) )/( sd( moran_bv_mort$Ano_", ano_dado, " , na.rm = T) ) ") ))
+mapa_moran_local<- localmoran_bv(x = xx, y = yy, listw = viz_pesos, nsim = 500)   
+lmoran_bv<- cbind(moran_bv_baixo_peso, mapa_moran_local )  
+
+
+# Creating quadrants for values
+W  <- matrix(data = 0, nrow = length(viz_pesos$neighbours) , ncol = length(viz_pesos$neighbours) ) ; for (ii in 1:(length(viz_pesos$neighbours)) ) {  
+  W[ii, viz_pesos$neighbours[[ii]] ]<- 1 }
+
+# Evaluating Significances
+eval(parse(text = paste0(' signif <- 0.05 ; lmoran_bv <- lmoran_bv%>%  # With  W multiplying  W%*%
+  mutate(quadrant_',ano_dado,'= ifelse(xx > 0 & W%*% yy > 0, 1, 0)) %>%        ## high-high
+  mutate(quadrant_',ano_dado,'= ifelse(xx < 0 & W%*% yy < 0, 2, quadrant_',ano_dado,')) %>% ## low-low
+  mutate(quadrant_',ano_dado,'= ifelse(xx < 0 & W%*% yy > 0, 3, quadrant_',ano_dado,')) %>% ## low-high
+  mutate(quadrant_',ano_dado,'= ifelse(xx > 0 & W%*% yy < 0, 4, quadrant_',ano_dado,')) %>% ## high-low   
+  mutate(quadrant_',ano_dado,'= ifelse(lmoran_bv$Pr.z....E.Ibvi.. > signif, 0, quadrant_',ano_dado,'))  ')  ))
+
+# Building the Maps
+eval(parse(text = paste0(' cortes_moran_bv_',ano_dado,'<- cut(lmoran_bv$quadrant_',ano_dado,', breaks = c(-0.5, 0.5, 1.5, 2.5, 3.5, 4.5),  labels = c("Not significant", "High-High","Low-Low","Low-High","High-Low"),  rigth = FALSE)  ')  )) ; no_axis <- theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank());
+eval(parse(text = paste0(' fig_moran_bv_',ano_dado -2013 ,'<-  ggplot() + 
+  geom_sf(data = lmoran_bv, aes(fill = cortes_moran_bv_',ano_dado,' ), color= NA,  size= .15) + 
+  
+  geom_sf(data = estado_mapa, fill = NA, color= "black", size = .15, lwd = 0.45) + 
+  geom_sf_text(data = estado_mapa,aes(label = abbrev_state),size = 2.5, fontface="bold") +  
+
+  labs(subtitle = paste0( ano_dado -2 , " - ", ano_dado), size=8) +                                                 
+  scale_fill_manual(values = c("white","red","blue",rgb(0,0,1,alpha=0.4),rgb(1,0,0,alpha=0.4)), drop = FALSE, name = "" ) +
+  
+  theme_minimal() + theme(legend.title = element_text(size = 10), plot.subtitle = element_text(hjust = 0.5) )+
+  annotation_north_arrow( location = "br", which_north = "true", height = unit(1, "cm"), width = unit(1, "cm"), pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"), 
+                          style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + no_axis  ')  )) 
+}
+
+# Bivariate Moran: SGA - Mortality
+#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Moran Local Bivariado BaixoPeso_Mortalidade por Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+gg_moran_bv<- ggarrange(fig_moran_bv_1, fig_moran_bv_2, fig_moran_bv_3,   fig_moran_bv_4, fig_moran_bv_5, fig_moran_bv_6,   fig_moran_bv_7, fig_moran_bv_8, fig_moran_bv_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")   
+annotate_figure(gg_moran_bv, top = text_grob("Bivariate local Moran I, Small for Gestational Age and\nInfant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
+#dev.off() 
+#
+
+
+
+
+
+##########################################################################################################################
+##############################################################################################
+##############
+#######     Analyzing Migration Balances and the Migration Rate
+
+taxas.migracao  <- read.csv(file = "~/Downloads/Baixo Peso/Dados/TaxasMigracao.csv", header = T, sep = ";" , dec = ",")  
+#saldos.migracao <- read.csv(file = "~/Downloads/Baixo Peso/Dados/SaldosMigratario.csv", header = T, sep = ";" ) 
+
+
+
+#######     Bivariate Analysis -- SGA and Migration Rate
+# Fixing SGA and Adding the Migration Balance or Migration Rate
+for (ano_dado in 2014:2018) { 
+
+# Adding Migration Rate or Migration Balances data to SGA data
+aux_bivariado_migracao<- left_join(baixo_peso_br, taxas.migracao[,-c(2,3)], by=c("code_micro"="CD_MICRO")) ; nome_st<-"Taxa" ; nome_st_titulo<- "Net Migration Rate" ;    
+##aux_bivariado_migracao<- left_join(baixo_peso_br, saldos.migracao[,-c(2,3)], by=c("code_micro"="CD_MICRO")) ; nome_st<-"Saldo" ; nome_st_titulo<- "Net Migration" ; 
+
+# Adds a new column to the data (bi_class)
+eval(parse(text = paste0( ' bivaridado_migracao <- bi_class(aux_bivariado_migracao, x = Ano_',ano_dado, ' , y = X', ano_dado,' , style = "quantile", dim = 3)  ')  ))
+
+# Generating the Bivariate Map
+eval(parse(text = paste0( ' fig_biv_migracao_',ano_dado -2013 ,'<-  ggplot() + geom_sf(data = bivaridado_migracao, mapping = aes(fill = bi_class), color = NA, size = 0.1, show.legend = FALSE) +
+  bi_scale_fill(pal = "GrPink", dim = 3) + bi_theme() +
+  geom_sf(data = estado_mapa, fill = NA, color= "black", size = .15, lwd = 0.45) +
+  geom_sf_text(data = estado_mapa, aes(label = abbrev_state), size = 2.5, color = "white", fontface = "bold") +
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank()) +
+  annotation_north_arrow( location = "br", which_north = "true", height = unit(1, "cm"), width = unit(1, "cm"), pad_x = unit(1.3, "in"), pad_y = unit(0.1, "in"), 
+     style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + 
+  labs( subtitle = paste0( ano_dado)   ) + theme( plot.subtitle = element_text(face = "plain", size = 10) ) ')  ))
+}
+
+# PIG and Migration 
+legendas_bv_migracao <- bi_legend(pal = "GrPink", dim = 3, xlab = "Small for Gestational Age", ylab = nome_st_titulo, size = 10) 
+
+#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Bivariado BaixoPeso_",nome_st," - Microrregiao 2014-2018.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+gg_biv_migracao<-  ggarrange( ggarrange(fig_biv_migracao_1, fig_biv_migracao_2, fig_biv_migracao_3,   fig_biv_migracao_4, nrow=2, ncol = 2),
+                     fig_biv_migracao_5,   nrow = 2, ncol = 1, heights = c(2,1)) #gg_biv<- ggarrange(fig_biv_1, fig_biv_2, fig_biv_3,   fig_biv_4, fig_biv_5,   nrow=3, ncol = 2, align = "hv")   # ,legend = 'right', legend.grob = legendas_bp  # , common.legend = TRUE, legend = "right"
+gg_biv_aux_migracao<- ggarrange(gg_biv_migracao, legendas_bv_migracao, nrow = 1, ncol = 2, widths = c(6,1)  )
+annotate_figure(gg_biv_aux_migracao, top = text_grob(paste0("Bivariate map, Small for Gestational Age and ",nome_st_titulo," across Brazilian microregions"), color = "black", face = "bold", size = 14))
+#dev.off() 
+#
+
+
+
+#######     Bivariate Analysis -- Infant Mortality and Migration Rate
+# Fixing Mortality Rate and Adding Migration Rate of the respective year
+for (ano_dado in 2014:2018) { 
+
+# Adding Migration Rate data to Mortality data
+aux_bivariado_migracao_mort<- left_join(tx_mortalidade, taxas.migracao[,-c(2,3)], by=c("code_micro"="CD_MICRO")) ; nome_st<-"Taxa" ;   nome_st_titulo<- "Net Migration Rate"   
+## aux_bivariado<- left_join(tx_mortalidade, saldos.migracao[,-c(2,3)], by=c("code_micro"="CD_MICRO")) ; nome_st<-"Saldo" ;  nome_st_titulo<- "Net Migration" ; 
+
+# Adds a new column to the data (bi_class)
+eval(parse(text = paste0( ' bivaridado_migracao_mort <- bi_class(aux_bivariado_migracao_mort, x = Ano_',ano_dado, ' , y = X', ano_dado,' , style = "quantile", dim = 3)  ')  ))
+
+# Generating the Bivariate Map for each year
+eval(parse(text = paste0( ' fig_biv_migracao_mort_',ano_dado -2013 ,'<-  ggplot() + geom_sf(data = bivaridado_migracao_mort, mapping = aes(fill = bi_class), color = NA, size = 0.1, show.legend = FALSE) +
+  bi_scale_fill(pal = "GrPink", dim = 3) + bi_theme() +
+  geom_sf(data = estado_mapa, fill = NA, color= "black", size = .15, lwd = 0.45) +
+  geom_sf_text(data = estado_mapa, aes(label = abbrev_state), size = 2.5, color = "white", fontface = "bold") +
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks.y=element_blank()) +
+  annotation_north_arrow( location = "br", which_north = "true", height = unit(1, "cm"), width = unit(1, "cm"), pad_x = unit(1.3, "in"), pad_y = unit(0.1, "in"), 
+     style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + 
+  labs( subtitle = paste0( ano_dado )  ) + theme( plot.subtitle = element_text(face = "plain", size = 10) ) ')  ))
+}
+
+# Bivariate map
+legendas_bv_migracao_mort <- bi_legend(pal = "GrPink", dim = 3, xlab = "Infant Mortality Rate", ylab = nome_st_titulo, size = 10) 
+
+#jpeg( paste0("~/Downloads/Baixo Peso/Bivariado Mortalidade_",nome_st," - Microrregiao 2014-2018.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+gg_biv_migracao_mort<-  ggarrange( ggarrange(fig_biv_migracao_mort_1, fig_biv_migracao_mort_2, fig_biv_migracao_mort_3,   fig_biv_migracao_mort_4, nrow=2, ncol = 2),
+                     fig_biv_migracao_mort_5,   nrow = 2, ncol = 1, heights = c(2,1)) #gg_biv<- ggarrange(fig_biv_1, fig_biv_2, fig_biv_3,   fig_biv_4, fig_biv_5,   nrow=3, ncol = 2)  
+gg_biv_aux_migracao_mort<- ggarrange(gg_biv_migracao_mort, legendas_bv_migracao_mort, nrow = 1, ncol = 2, widths = c(6,1)  )
+annotate_figure(gg_biv_aux_migracao_mort, top = text_grob(paste0("Bivariate map, Infant Mortality Rate and ",nome_st_titulo," across Brazilian microregions"), color = "black", face = "bold", size = 14))
+#dev.off() 
+#
+
+
+
+
+
+##############################################################################################
+#######     Lee Index
+# https://stackoverflow.com/questions/45177590/map-of-bivariate-spatial-correlation-in-r-bivariate-lisa
+
+for (ano_dado in 2014:2022) { 
+
+# Generating the Map with Neighbors removing Fernando de Noronha - PE (island)
+lee_bv_baixo_peso<- baixo_peso_br[!(baixo_peso_br$name_micro == "Fernando De Noronha"), ] ; 
+lee_bv<- lee_bv_baixo_peso[,-(6:14)] 
+lee_bv_mort<- tx_mortalidade[!(tx_mortalidade$name_micro == "Fernando De Noronha"), ] ; nome_titulo<- "Lee's Statistic"
+
+# Generating neighbors by proximity to the queen (queen true, from chess). Same neighborhood
+vizinhos <- poly2nb(lee_bv_baixo_peso, queen=TRUE) #; vizinhos[1]
+viz_pesos <- nb2listw(vizinhos, style="W", zero.policy=TRUE) # Weight of neighbors; style = W and normalization by the line
+
+# Normalizing the Data (moran_bv and localmoran_bv = already normalize the data at input, I redid it for preciosity)
+eval(parse(text = paste0("  xx<- ( lee_bv_baixo_peso$Ano_", ano_dado, "  - mean( lee_bv_baixo_peso$Ano_", ano_dado, " , na.rm = T)  )/( sd( lee_bv_baixo_peso$Ano_", ano_dado, "  , na.rm = T)   ) ")  ))
+eval(parse(text = paste0("  yy<- ( lee_bv_mort$Ano_", ano_dado, "  - mean( lee_bv_mort$Ano_", ano_dado, " , na.rm = T) )/( sd( lee_bv_mort$Ano_", ano_dado, " , na.rm = T) ) ") ))
+
+# Lee index and # Lee’s L statistic (Global)
+lee_xy <- lee(x = xx, y = yy, listw = viz_pesos, n = length(xx), zero.policy = TRUE) ; 
+#lee_xy[1] ; summary(lee_xy$localL) # Checking
+
+# Organizing Data in a Table
+eval(parse(text = paste0(" lee_bv<- cbind(lee_bv, data.frame( indice_lee_",ano_dado ," = lee_xy$localL ))" ) ))
+
+
+### Map of the Bivariate Lee Index of Underweight and Mortality (value scales)
+eval(parse(text = paste0(' cortes_lee_', ano_dado, ' <- cut(lee_bv$indice_lee_', ano_dado, ', breaks = c(-2, -0.5, 0.5, 1, 2, 20),  labels = c("[-2:-0.5)", "[-0.5:0.5)", "[0.5:1.0)", "[1.0:2.0)", "[2.0+"),  rigth = FALSE)  ')  )) ; no_axis <- theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank()) 
+
+eval(parse(text = paste0(' fig_lee_',ano_dado -2013 ,'<- ggplot() + 
+  geom_sf(data = lee_bv, aes(fill = cortes_lee_', ano_dado, ' ), color= NA,  size= .15) + # "grey46" ; "black"           # Escala discreta de cores
+  
+  geom_sf(data = estado_mapa, fill = NA, color= "black", size = .15, lwd = 0.45) +         # Estados destacados
+  geom_sf_text(data = estado_mapa,aes(label = abbrev_state),size = 2.5, fontface="bold") + 
+  
+  labs(subtitle=paste0( ano_dado -2 , " - ", ano_dado) , size=8) +  
+  scale_fill_manual(values =c("#0000FF", "#FFFFFF", "#FFBFBF", "#FF0000", "darkred"), drop = FALSE, name="Lee\'s Index") +   # Em Ingles: Small for Gestational Age
+  #scale_fill_manual(values = c("#0000FF", "#FFFFFF", "#FFBFBF", "#FF0000", "darkred"), drop = FALSE, name="Preterm Birth (%)")+   # Em Ingles: Preterm Birth
+    
+  theme_minimal() + theme(legend.title = element_text(size = 10), plot.subtitle = element_text(hjust = 0.5) )+
+  annotation_north_arrow( location = "br", which_north = "true", height = unit(1, "cm"), width = unit(1, "cm"), pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"), 
+                          style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + no_axis ')  )) ; 
+}
+
+
+# Generating Map of Lee Index
+#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Indice de Lee - Brazil Standard - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+gg_baixo_peso_lee<- ggarrange(fig_lee_1, fig_lee_2, fig_lee_3,   fig_lee_4, fig_lee_5, fig_lee_6,   fig_lee_7, fig_lee_8, fig_lee_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")  
+annotate_figure(gg_baixo_peso_lee, top = text_grob("Lee's Index, Small for Gestational Age and\nInfant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
+#dev.off()
+
+
+
+
+
+##############################################################################################
+#######     Map of the Global and Local Moran's Index - Univariate (For a specific year)
+
+# Choosing a Year - Generating the Map with Neighbors removing Fernando de Noronha - PE (island)
+ano_dado<- 2022 ; moran_dados_ano<-   baixo_peso_br[!(baixo_peso_br$name_micro == "Fernando De Noronha"), ] ; nome_titulo<- "Baixo Peso"
+#ano_dado<- 2022 ; moran_dados_ano<- tx_mortalidade[!(tx_mortalidade$name_micro == "Fernando De Noronha"), ] ; nome_titulo<- "Mortalidade"
+
+
+# Generating neighbors by proximity to the queen (queen true, from chess). Same neighborhood for SGA and Mortality
+vizinhos <- poly2nb(moran_dados_ano, queen=TRUE) #; vizinhos[1]
+
+# Weight of neighbors; style = W and normalization by the line
+viz_pesos <- nb2listw(vizinhos, style="W", zero.policy=TRUE) 
+#; viz_pesos$weights[1] ; print.listw(viz_pesos, zero.policy = TRUE)  # Checking
+
+# Moran Global I
+eval(parse(text = paste0(" mapa_moran_I <- moran(x = moran_dados_ano$Ano_", ano_dado , ", listw = viz_pesos, n = length(vizinhos), S0 = Szero(viz_pesos), zero.policy = TRUE) ") ))
+
+
+###  Generating the Local Moran Index
+eval(parse(text = paste0(" mapa_moran_local<- localmoran(x = moran_dados_ano$Ano_", ano_dado, ", listw = viz_pesos, adjust.x=TRUE, zero.policy = TRUE)" ) )) 
+
+# Saving to a map object
+lmoran<- cbind(moran_dados_ano, mapa_moran_local )  
+
+# Centers the local Moran around the mean
+lmoran$Ii <- lmoran$Ii - mean(lmoran$Ii, na.rm = TRUE) 
+
+# The spatial lag value is created (the average of the neighboring values of each weight)
+eval(parse(text = paste0(" lmoran$lag.prob8091<- lag.listw(x = viz_pesos, var = lmoran$Ano_", ano_dado, ", zero.policy = TRUE)" )  ))
+eval(parse(text = paste0(" lmoran$prob8091.n <- lmoran$Ano_", ano_dado, " - mean(lmoran$Ano_", ano_dado, ", na.rm = TRUE)")  ))  # Centraliza a variável de interesse em torno de sua média 
+lmoran$lag.prob8091 <- lmoran$lag.prob8091 - mean(lmoran$lag.prob8091, na.rm = TRUE) 
+
+
+# Creating quadrants for values
+signif <- 0.05 ; lmoran <- lmoran%>% 
+  mutate(quadrant= ifelse(prob8091.n > 0 & lag.prob8091 > 0, 1, 0)) %>%        ## high-high
+  mutate(quadrant= ifelse(prob8091.n < 0 & lag.prob8091 < 0, 2, quadrant)) %>% ## low-low
+  mutate(quadrant= ifelse(prob8091.n < 0 & lag.prob8091 > 0, 3, quadrant)) %>% ## low-high
+  mutate(quadrant= ifelse(prob8091.n > 0 & lag.prob8091 < 0, 4, quadrant)) %>% ## high-low   
+  mutate(quadrant= ifelse(lmoran$Pr.z....E.Ii.. > signif, 0, quadrant))  
+
+# Making a map with areas
+#jpeg( paste0("~/Downloads/Baixo Peso/",referencia_pig,"_Moran Local - ", nome_titulo," Microrregiao ", ano_dado,".jpg"), width = 7, height =5, units = 'in',  res = 400,quality = 100)   
+tm_shape(lmoran) + tm_fill(col = "quadrant",  breaks = c(0, 1, 2, 3, 4, 5) , palette= c("white","red","blue",rgb(0,0,1,alpha=0.4),rgb(1,0,0,alpha=0.4)),
+                           labels = c("Not significant", "High-High","Low-Low","Low-High","High-Low"), title="") +  tm_legend(text.size = 0.85)  + 
+  tm_borders(alpha= 0.0) + 
+  tm_layout(main.title = paste0("Moran Local: ", nome_titulo," ", ano_dado-2, " - ", ano_dado ), main.title.position = "center", frame = F) +   #tm_layout( frame = F) + 
+  tm_shape(estado_mapa) + tm_borders( alpha= 1) + tm_text(text = "abbrev_state", size = 0.6)
+#dev.off()
+#
+
