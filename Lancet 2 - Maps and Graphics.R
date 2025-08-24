@@ -5,7 +5,7 @@
 
 ###  Packages and Set Work Directory
 rm(list = ls()) ; library(ggplot2) ; library(ggspatial) ; library(spdep) ; library(dplyr) ; library(tmap) ; library(biscale) ; library(cowplot) ; library(geobr) ; library(RColorBrewer) ; library(stringr) ; library(ggpubr)  ; library(classInt) ; library(sf)
-
+library(boot); library("Matrix"); library("grDevices"); library("magrittr"); library("Matrix"); library("spData"); library("utils")
 
 ### Loading SGA and Mortality Data (first part)
 # SGA for WHO table
@@ -67,12 +67,12 @@ eval(parse(text = paste0(' fig_bp_',ano_dado -2013 ,'<- ggplot() +
 
 theme(legend.text = element_text(size = 16)) # Aumenta tamanho do texto legenda
 #Export plot in pdf format
-#pdf(paste0("Maps and tables/",referencia_pig, "_Baixo Peso - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+pdf(paste0("Maps and tables/",referencia_pig, "_Baixo Peso - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
 #In case you want to export the jpeg
 #jpeg( paste0("Maps and tables/",referencia_pig,"_Baixo Peso - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   # width = 8.3, height = 11.7, # width = 14, height = 12,   #legendas_bp<- get_legend(fig_bp_1)
 gg_baixo_peso<- ggarrange(fig_bp_1, fig_bp_2, fig_bp_3,   fig_bp_4, fig_bp_5, fig_bp_6,   fig_bp_7, fig_bp_8, fig_bp_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")
 annotate_figure(gg_baixo_peso, top = text_grob("Smal for Gestational Age across Brazilian microregions", color = "black", face = "bold", size = 14))
-#dev.off()
+dev.off()
 #
 
 
@@ -99,12 +99,12 @@ eval(parse(text = paste0(' fig_mort_',ano_dado -2013 ,'<- ggplot() +
                           style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + no_axis ')  )) ; 
 }
 #Export plot in pdf
-#pdf(paste0("Maps and tables/Mortalidade - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+pdf(paste0("Maps and tables/Mortalidade - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
 #In case you want jpeg
 #jpeg( paste0("Maps and tables/Mortalidade - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_mort<- ggarrange(fig_mort_1, fig_mort_2, fig_mort_3,   fig_mort_4, fig_mort_5, fig_mort_6,   fig_mort_7, fig_mort_8, fig_mort_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")   # ,legend = 'right', legend.grob = legendas_bp
 annotate_figure(gg_mort, top = text_grob("Infant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
-#dev.off() 
+dev.off() 
 #
 
 
@@ -138,13 +138,13 @@ eval(parse(text = paste0( ' fig_biv_',ano_dado -2013 ,'<-  ggplot() + geom_sf(da
 legendas_bv <- bi_legend(pal = "GrPink", dim = 3, xlab = "Small for Gestational Age", ylab = "Infant Mortality Rate", size = 10) 
 
 #Export plot in pdf format
-#pdf(paste0("Maps and tables/",referencia_pig, "_Bivariado BaixoPeso_Mortalidade - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+pdf(paste0("Maps and tables/",referencia_pig, "_Bivariado BaixoPeso_Mortalidade - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
 #In case you want to export the jpeg
 #jpeg( paste0("Maps and tables/",referencia_pig,"_Bivariado BaixoPeso_Mortalidade - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_biv<- ggarrange(fig_biv_1, fig_biv_2, fig_biv_3,   fig_biv_4, fig_biv_5, fig_biv_6,   fig_biv_7, fig_biv_8, fig_biv_9,   nrow=3, ncol = 3)   # ,legend = 'right', legend.grob = legendas_bp  # , common.legend = TRUE, legend = "right"
 gg_biv_aux<- ggarrange(gg_biv,legendas_bv, nrow = 1, ncol = 2, widths = c(6,1)  )
 annotate_figure(gg_biv_aux, top = text_grob("Bivariate map, Small for Gestational Age and Infant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
-#dev.off() 
+dev.off() 
 #
 
 
@@ -204,12 +204,12 @@ eval(parse(text = paste0(' fig_moran_bv_',ano_dado -2013 ,'<-  ggplot() +
 
 # Bivariate Moran: SGA - Mortality
 #Export plot in pdf format
-#pdf(paste0("Maps and tables/",referencia_pig, "_Moran Local Bivariado BaixoPeso_Mortalidade por Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+pdf(paste0("Maps and tables/",referencia_pig, "_Moran Local Bivariado BaixoPeso_Mortalidade por Microrregiao 2014-2022.pdf"), width = 14, height = 12)
 #In case you want to export the jpeg
 #jpeg( paste0("Maps and tables/",referencia_pig,"_Moran Local Bivariado BaixoPeso_Mortalidade por Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_moran_bv<- ggarrange(fig_moran_bv_1, fig_moran_bv_2, fig_moran_bv_3,   fig_moran_bv_4, fig_moran_bv_5, fig_moran_bv_6,   fig_moran_bv_7, fig_moran_bv_8, fig_moran_bv_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")   
 annotate_figure(gg_moran_bv, top = text_grob("Bivariate local Moran I, Small for Gestational Age and\nInfant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
-#dev.off() 
+dev.off() 
 #
 
 
@@ -252,14 +252,14 @@ eval(parse(text = paste0( ' fig_biv_migracao_',ano_dado -2013 ,'<-  ggplot() + g
 legendas_bv_migracao <- bi_legend(pal = "GrPink", dim = 3, xlab = "Small for Gestational Age", ylab = nome_st_titulo, size = 10) 
 
 #Export plot in pdf format
-#pdf(paste0("Maps and Tables/",referencia_pig, "_Bivariado BaixoPeso_",nome_st," - Microrregiao 2014-2018.pdf"), width = 14, height = 12)
+pdf(paste0("Maps and Tables/",referencia_pig, "_Bivariado BaixoPeso_",nome_st," - Microrregiao 2014-2018.pdf"), width = 14, height = 12)
 #In case you want to export the jpeg
 #jpeg( paste0("Maps and Tables/",referencia_pig,"_Bivariado BaixoPeso_",nome_st," - Microrregiao 2014-2018.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_biv_migracao<-  ggarrange( ggarrange(fig_biv_migracao_1, fig_biv_migracao_2, fig_biv_migracao_3,   fig_biv_migracao_4, nrow=2, ncol = 2),
                      fig_biv_migracao_5,   nrow = 2, ncol = 1, heights = c(2,1)) #gg_biv<- ggarrange(fig_biv_1, fig_biv_2, fig_biv_3,   fig_biv_4, fig_biv_5,   nrow=3, ncol = 2, align = "hv")   # ,legend = 'right', legend.grob = legendas_bp  # , common.legend = TRUE, legend = "right"
 gg_biv_aux_migracao<- ggarrange(gg_biv_migracao, legendas_bv_migracao, nrow = 1, ncol = 2, widths = c(6,1)  )
 annotate_figure(gg_biv_aux_migracao, top = text_grob(paste0("Bivariate map, Small for Gestational Age and ",nome_st_titulo," across Brazilian microregions"), color = "black", face = "bold", size = 14))
-#dev.off() 
+dev.off() 
 #
 
 
@@ -290,14 +290,14 @@ eval(parse(text = paste0( ' fig_biv_migracao_mort_',ano_dado -2013 ,'<-  ggplot(
 legendas_bv_migracao_mort <- bi_legend(pal = "GrPink", dim = 3, xlab = "Infant Mortality Rate", ylab = nome_st_titulo, size = 10) 
 
 #Export plot in pdf format
-#pdf(paste0("Maps and Tables/Bivariado Mortalidade_",nome_st," - Microrregiao 2014-2018.pdf"), width = 14, height = 12)
+pdf(paste0("Maps and Tables/Bivariado Mortalidade_",nome_st," - Microrregiao 2014-2018.pdf"), width = 14, height = 12)
 #In case you want to export the jpeg
 #jpeg( paste0("Maps and Tables/Bivariado Mortalidade_",nome_st," - Microrregiao 2014-2018.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_biv_migracao_mort<-  ggarrange( ggarrange(fig_biv_migracao_mort_1, fig_biv_migracao_mort_2, fig_biv_migracao_mort_3,   fig_biv_migracao_mort_4, nrow=2, ncol = 2),
                      fig_biv_migracao_mort_5,   nrow = 2, ncol = 1, heights = c(2,1)) #gg_biv<- ggarrange(fig_biv_1, fig_biv_2, fig_biv_3,   fig_biv_4, fig_biv_5,   nrow=3, ncol = 2)  
 gg_biv_aux_migracao_mort<- ggarrange(gg_biv_migracao_mort, legendas_bv_migracao_mort, nrow = 1, ncol = 2, widths = c(6,1)  )
 annotate_figure(gg_biv_aux_migracao_mort, top = text_grob(paste0("Bivariate map, Infant Mortality Rate and ",nome_st_titulo," across Brazilian microregions"), color = "black", face = "bold", size = 14))
-#dev.off() 
+dev.off() 
 #
 
 
@@ -352,12 +352,12 @@ eval(parse(text = paste0(' fig_lee_',ano_dado -2013 ,'<- ggplot() +
 
 # Generating Map of Lee Index
 #Export plot in pdf format
-#pdf(paste0("Maps and Tables/",referencia_pig, "_Indice de Lee - Brazil Standard - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+pdf(paste0("Maps and Tables/",referencia_pig, "_Indice de Lee - Brazil Standard - Microrregiao 2014-2022.pdf"), width = 14, height = 12)
 #In case you want to export the jpeg
 #jpeg( paste0("Maps and Tables/",referencia_pig,"_Indice de Lee - Brazil Standard - Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_baixo_peso_lee<- ggarrange(fig_lee_1, fig_lee_2, fig_lee_3,   fig_lee_4, fig_lee_5, fig_lee_6,   fig_lee_7, fig_lee_8, fig_lee_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")  
 annotate_figure(gg_baixo_peso_lee, top = text_grob("Lee's Index, Small for Gestational Age and\nInfant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
-#dev.off()
+dev.off()
 
 
 
@@ -420,3 +420,159 @@ tm_shape(lmoran) + tm_fill(col = "quadrant", breaks = c(0, 1, 2, 3, 4, 5) , pale
 tm_shape(estado_mapa) + tm_borders( alpha= 1) + tm_text(text = "abbrev_state", size = 0.6)
 dev.off()
 #
+
+
+
+
+
+
+
+
+
+
+
+#########################################################################
+##############  Bivariate Lee SGA and Mortality Rate
+
+# ----------------------------------------------------- #
+for (ano_dado in 2014:2022) {  
+  
+  #    Generating the Map with Neighbors removing Fernando de Noronha - PE (island)
+  lee_bv_baixo_peso<-   baixo_peso_br[!(baixo_peso_br$name_micro == "Fernando De Noronha"), ] ; lee_bv_mort<- tx_mortalidade[!(tx_mortalidade$name_micro == "Fernando De Noronha"), ] ; nome_titulo<- "Lee"
+  
+  # Generating neighbors by proximity to the queen (queen true, from chess). Same neighborhood for SGA and Mortality
+  vizinhos <- poly2nb(lee_bv_baixo_peso, queen=TRUE) #; vizinhos[1]
+  
+  # Weight of neighbors; style = B and normalization by the line
+  viz_pesos <- nb2listw(vizinhos, style="B", zero.policy=TRUE) 
+  #; viz_pesos$weights[1] ; print.listw(viz_pesos, zero.policy = TRUE) # Cheking
+  
+  ###   Moran Global and Local Bivariate (moran_bv and localmoran_bv = already normalize the data at input)
+  eval(parse(text = paste0("  xx<- ( lee_bv_baixo_peso$Ano_", ano_dado, "  - mean( lee_bv_baixo_peso$Ano_", ano_dado, " , na.rm = T)  )/( sd( lee_bv_baixo_peso$Ano_", ano_dado, "  , na.rm = T)   ) ")  ))
+  eval(parse(text = paste0("  yy<- ( lee_bv_mort$Ano_", ano_dado, "  - mean( lee_bv_mort$Ano_", ano_dado, " , na.rm = T) )/( sd( lee_bv_mort$Ano_", ano_dado, " , na.rm = T) ) ") ))
+  
+  
+  simula_lee <- function(x, y, listw, nsim = nsim, zero.policy = NULL, na.action = na.fail) {
+    
+    if (deparse(substitute(na.action)) == "na.pass") 
+      stop ("na.pass not permitted")
+    na.act <- attr(na.action(cbind(x, y)), "na.action")
+    x[na.act] <- NA
+    y[na.act] <- NA
+    x <- na.action(x)
+    y <- na.action(y)
+    if (!is.null(na.act)) {
+      subset <- !(1:length(listw$neighbours) %in% na.act)
+      listw <- subset(listw, subset, zero.policy = zero.policy)
+    }
+    n <- length(listw$neighbours)
+    if ((n != length(x)) | (n != length(y))) 
+      stop ("objects of different length")
+    gamres <- suppressWarnings(nsim > gamma(n + 1))
+    if (gamres) 
+      stop ("nsim too large for this number of observations")
+    if (nsim < 1) 
+      stop ("nsim too small")
+    xy <- data.frame(x, y)
+    S2 <- sum((unlist(lapply(listw$weights, sum)))^2)
+    
+    lee_boot <- function(var, i, ...) {
+      return(spdep::lee(x = var[i, 1], y = var[i, 2], ...)$localL)
+    }
+    
+    res <- boot::boot(xy, statistic = lee_boot, R = nsim, sim = "permutation", 
+                      listw = listw, n = n, S2 = S2, zero.policy = zero.policy)
+  }
+  
+  # ----------------------------------------------------- #
+  # Adjacency Matrix
+  lw <- spdep::nb2listw(vizinhos, style = "B", zero.policy = T)
+  W <- listw2mat(lw)
+  W  <- as.matrix(W / Matrix::rowSums(W))
+  W[which(is.na(W))] <- 0
+  
+  # ----------------------------------------------------- #
+  # Calculate the index and its simulated distribution
+  # for global and local values
+  
+  # Global Lee's L
+  spdep::lee.test(x = xx,
+                  y = yy,
+                  listw = viz_pesos,
+                  zero.policy = TRUE,
+                  alternative = "two.sided",
+                  na.action = na.omit)
+  
+  # Local Lee's L values
+  m <- spdep::lee(x =xx,
+                  y = yy,
+                  listw = lw,
+                  n = length(xx),
+                  zero.policy = TRUE,
+                  NAOK = TRUE)
+  
+  # Local Lee's L simulations
+  locallee <- simula_lee(x = xx,
+                         y =yy,
+                         listw = lw,
+                         nsim = 500,
+                         zero.policy = TRUE,
+                         na.action = na.omit)
+  
+  m_i <- m[[2]]  # local values
+  
+  # Identify the significant values 
+  alpha <- 0.05  # for a 95% confidence interval
+  probs <- c(alpha/2, 1-alpha/2)
+  intervals <- t(apply(t(locallee[[2]]), 1, function(x) quantile(x, probs = probs)))
+  sig <- ( m_i < intervals[ , 1] ) | ( m_i > intervals[ , 2] )
+  
+  # ----------------------------------------------------- #
+  # Prepare for plotting
+  map_sf <- lee_bv_baixo_peso
+  map_sf$sig <- sig
+  
+  # Identify the Lee's L clusters
+  Xp <- scale(xx)[ , 1]
+  Yp <- scale(yy)[ , 1]
+  
+  patterns <- as.character(interaction(Xp > 0, W %*% Yp > 0)) 
+  patterns <- patterns %>% 
+    stringr::str_replace_all("TRUE","High") %>% 
+    stringr::str_replace_all("FALSE","Low")
+  patterns[map_sf$sig == 0] <- "Not significant"
+  map_sf$patterns <- patterns
+  
+  # Rename Lee's L clusters
+  map_sf$patterns2 <- factor(map_sf$patterns,
+                             levels = c("Not significant","High.High", "High.Low", "Low.High", "Low.Low"),
+                             labels = c("Not significant","High-High", "High-Low", "Low-High","Low-Low"))
+  
+  # ----------------------------------------------------- #
+  # Building the Maps
+  no_axis <- theme(axis.title=element_blank(), axis.text=element_blank(), axis.ticks=element_blank());
+  eval(parse(text = paste0(' fig_lee_bv_',ano_dado -2013 ,'<-  ggplot() + 
+  geom_sf(data = map_sf, aes(fill = patterns2), color= NA,  size= .15) + 
+  
+  geom_sf(data = estado_mapa, fill = NA, color= "black", size = .15, lwd = 0.45) + 
+  geom_sf_text(data = estado_mapa,aes(label = abbrev_state),size = 2.5, fontface="bold") +  
+
+  labs(subtitle = paste0( ano_dado -2 , " - ", ano_dado), size=8) +                                                 
+  scale_fill_manual(values = c("white","red","blue",rgb(0,0,1,alpha=0.4),rgb(1,0,0,alpha=0.4)), drop = FALSE, name = "" ) +
+  
+  theme_minimal() + theme(legend.title = element_text(size = 10), plot.subtitle = element_text(hjust = 0.5) )+
+  annotation_north_arrow( location = "br", which_north = "true", height = unit(1, "cm"), width = unit(1, "cm"), pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"), 
+                          style = north_arrow_fancy_orienteering ) + ggspatial::annotation_scale() + no_axis  ')  )) 
+  }
+
+# Bivariate Lee: SGA - Mortality
+#Export plot in pdf format
+pdf(paste0("Maps and tables/",referencia_pig, "_Lee Local Bivariado BaixoPeso_Mortalidade por Microrregiao 2014-2022.pdf"), width = 14, height = 12)
+#In case you want to export the jpeg
+#jpeg( paste0("Maps and tables/",referencia_pig,"_Lee Local Bivariado BaixoPeso_Mortalidade por Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
+gg_lee_bv<- ggarrange(fig_lee_bv_1, fig_lee_bv_2, fig_lee_bv_3,   fig_lee_bv_4, fig_lee_bv_5, fig_lee_bv_6,   fig_lee_bv_7, fig_lee_bv_8, fig_lee_bv_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")   
+annotate_figure(gg_lee_bv, top = text_grob("Bivariate local Lee, Small for Gestational Age and\nInfant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
+dev.off() 
+#
+
+

@@ -266,9 +266,9 @@ library(ggplot2) ; library(ggspatial) ; library(spdep) ; library(dplyr) ; librar
 ### Carregando Dados do Baixo Peso: Escolher entre WHO e Intergrowth
 
 # Loading SGA RData save for WHO or Intergrowth table
-load(file = "data/resul_peso_who_mort_cidade (Parte 1).RData")
+load(file = "data/resul_peso_who_mort_cidade.RData")
 # Loading SGA RData save for WHO or Intergrowth table
-#load(file = "data/resul_peso_intergrowth_mort_cidade (Parte 1).RData")             
+#load(file = "data/resul_peso_intergrowth_mort_cidade.RData")             
 
 # Saving data in a list, to be able to aggregate state, micro and city
 resul_baixo_peso<- list() ; resul_baixo_peso$cidade<-resul_baixo_peso_cidade 
