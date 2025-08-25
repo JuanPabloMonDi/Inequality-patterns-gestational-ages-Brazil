@@ -545,8 +545,8 @@ for (ano_dado in 2014:2022) {
   
   # Rename Lee's L clusters
   map_sf$patterns2 <- factor(map_sf$patterns,
-                             levels = c("Not significant","High.High", "High.Low", "Low.High", "Low.Low"),
-                             labels = c("Not significant","High-High", "High-Low", "Low-High","Low-Low"))
+                             levels = c("Not significant","High.High","Low.Low", "Low.High", "High.Low"),
+                             labels = c("Not significant","High-High","Low-Low", "Low-High", "High-Low"))
   
   # ----------------------------------------------------- #
   # Building the Maps
