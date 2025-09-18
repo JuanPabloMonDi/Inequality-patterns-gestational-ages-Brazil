@@ -18,8 +18,8 @@ Some information that you might know :
 
 -   The link to a Google Drive folder with some RData to give the option to avoid intensive computation parts.
 
--   This GitHub
+-   Next step: Explain briefly the files and folders on this repository
 
--   In case you wanna cite this GitHub, please use the same citation of the paper. By the moment, the citation is this one:\
+-   In case you wanna cite this GitHub, please use the same citation of the paper. We will provide it here briefly
 
--   Provide a brief context of the article
+-   Next steps: Provide a brief context of the article
