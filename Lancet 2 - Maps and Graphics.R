@@ -57,8 +57,8 @@ eval(parse(text = paste0(' fig_bp_',ano_dado -2013 ,'<- ggplot() +
   geom_sf_text(data = estado_mapa,aes(label = abbrev_state),size = 2.5, fontface="bold") + 
   
   labs(subtitle=paste0( ano_dado -2 , " - ", ano_dado) , size=8) +  
-  scale_fill_manual(values = brewer.pal(n = 9, name = "YlOrRd")[c(1,2,3,5,8,9)], drop = FALSE, name="Small for Gestational\nAge (%)") +   # In Ingles: Small for Gestational Age
-  #scale_fill_manual(values = brewer.pal(n = 9, name = "YlOrRd")[c(1,2,3,5,8,9)], drop = FALSE, name="Preterm Birth (%)")+   # In Ingles: Preterm Birth
+  scale_fill_manual(values = brewer.pal(n = 9, name = "YlOrRd")[c(1,2,3,5,8,9)], drop = FALSE, name="Smal for Gestational\nAge (%)") +   # In english: Small for Gestational Age
+  #scale_fill_manual(values = brewer.pal(n = 9, name = "YlOrRd")[c(1,2,3,5,8,9)], drop = FALSE, name="Preterm Birth (%)")+   # In english: Preterm Birth
     
   theme_minimal() + theme(legend.title = element_text(size = 14), legend.text = element_text(size = 14), plot.subtitle = element_text(hjust = 0.5) )+
   annotation_north_arrow( location = "br", which_north = "true", height = unit(1, "cm"), width = unit(1, "cm"), pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"), 
@@ -571,7 +571,7 @@ pdf(paste0("Maps and tables/",referencia_pig, "_Lee Local Bivariado BaixoPeso_Mo
 #In case you want to export the jpeg
 #jpeg( paste0("Maps and tables/",referencia_pig,"_Lee Local Bivariado BaixoPeso_Mortalidade por Microrregiao 2014-2022.jpg"), width = 14, height = 12, units = 'in', res = 400, quality = 100)   
 gg_lee_bv<- ggarrange(fig_lee_bv_1, fig_lee_bv_2, fig_lee_bv_3,   fig_lee_bv_4, fig_lee_bv_5, fig_lee_bv_6,   fig_lee_bv_7, fig_lee_bv_8, fig_lee_bv_9,   nrow=3, ncol = 3, common.legend = TRUE, legend = "right")   
-annotate_figure(gg_lee_bv, top = text_grob("Bivariate local Lee, Small for Gestational Age and\nInfant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
+annotate_figure(gg_lee_bv, top = text_grob("Bivariate local Lee, Smal for Gestational Age and\nInfant Mortality Rates across Brazilian microregions", color = "black", face = "bold", size = 14))
 dev.off() 
 #
 
