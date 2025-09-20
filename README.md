@@ -42,6 +42,6 @@ This repository contains the following components:
 
 ## Next steps:
 
--    If necessary, we may add a link to a Google Drive folder with some RData to give the option to avoid intensive computation parts.
+-    If necessary, we may add a link to a Google Drive folder with some RData to give the option of avoid intensive computation parts.
 
--   In case you wanna cite this GitHub, please use the same citation of the paper. (You will find it here briefly 😊)
+-   In case you wanna cite this GitHub, please use the same citation of the paper. (You will find it here soon 😊)
